@@ -1,0 +1,153 @@
+esphome:
+  name: kitchen_lights
+  platform: ESP8266
+  board: d1_mini_pro
+
+wifi:
+  ssid: "Jifi"
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Kitchen Lights Fallback Hotspot"
+    password: "MEptkJW4nrhI"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+light:
+  - platform: neopixelbus
+    pin: GPIO2
+    id: left_of_stove
+    num_leds: 27
+    name: "Left of stove"
+    variant: SK6812
+    type: GRBW
+    method: ESP8266_UART1
+  # - platform: neopixelbus
+  #   pin: D3
+  #   id: right_of_stove
+  #   num_leds: 165
+  #   name: "Right of stove"
+  #   variant: SK6812
+  #   type: GRBW
+  #   method: BIT_BANG
+  - platform: neopixelbus
+    type: GRBW
+    pin: GPIO3
+    num_leds: 165
+    variant: SK6812
+    method: ESP8266_DMA
+    name: "Right of stove"
+    id: right_of_stove
+  - platform: partition
+    name: "Kitchen LEDs"
+    segments:
+      - id: left_of_stove
+        from: 0
+        to: 26
+      - id: right_of_stove
+        from: 0
+        to: 164
+    effects:
+      - addressable_rainbow:
+          name: Rainbow (default)
+      - addressable_rainbow:
+          name: Rainbow (wide)
+          speed: 10
+          width: 100
+      - addressable_fireworks:
+          name: Fireworks (default)
+      - addressable_fireworks:
+          name: Fireworks (custom)
+          update_interval: 32ms
+          spark_probability: 75%
+          use_random_color: true
+          fade_out_rate: 120
+      - random:
+          name: Random (default)
+      - random:
+          name: Random (fast)
+          transition_length: 1s
+          update_interval: 3s
+      - random:
+          name: Random (colorloop)
+          transition_length: 3s
+          update_interval: 3s
+      - addressable_color_wipe:
+          name: Color wipe
+      - addressable_color_wipe:
+          name: Pride color wipe
+          colors:
+            - red: 100%
+              green: 0%
+              blue: 9%
+              white: 0%
+              num_leds: 20
+            - red: 100%
+              green: 64%
+              blue: 17%
+              white: 0%
+              num_leds: 20
+            - red: 100%
+              green: 100%
+              blue: 25%
+              white: 0%
+              num_leds: 20
+            - red: 0%
+              green: 50%
+              blue: 9%
+              white: 0%
+              num_leds: 20
+            - red: 0%
+              green: 0%
+              blue: 17%
+              white: 0%
+              num_leds: 20
+            - red: 53%
+              green: 0%
+              blue: 49%
+              white: 0%
+              num_leds: 20
+          add_led_interval: 30ms
+          reverse: False
+
+      - strobe:
+          name: Strobe (default)
+      - strobe:
+          name: Strobe (custom)
+          colors:
+            - brightness: 100%
+              white: 100%
+              duration: 50ms
+              state: True
+            - brightness: 0%
+              white: 0%
+              duration: 250ms
+              state: False
+  # - platform: fastled_clockless
+  #   chipset: SK6812
+  #   pin: D5
+  #   num_leds: 27
+  #   name: "LED 1"
+
+binary_sensor:
+  - platform: gpio
+    pin: D5
+    name: "HögerPIR"
+    device_class: motion
+  - platform: gpio
+    pin: D6
+    name: "MittenPIR"
+    device_class: motion
+  - platform: gpio
+    pin: D7
+    name: "VänsterPIR"
+    device_class: motion
