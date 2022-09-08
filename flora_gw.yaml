@@ -21,24 +21,26 @@ ota:
 
 esp32_ble_tracker:
 
-sensor:
-  - platform: xiaomi_hhccjcy01
-    mac_address: 'C4:7C:8D:6B:48:63'
-    temperature:
-      name: "Xiaomi HHCCJCY01 :48:63 Temperature"
-    moisture:
-      name: "Xiaomi HHCCJCY01 :48:63 Moisture"
-    illuminance:
-      name: "Xiaomi HHCCJCY01 :48:63 Illuminance"
-    conductivity:
-      name: "Xiaomi HHCCJCY01 :48:63 Soil Conductivity"
-  - platform: xiaomi_hhccjcy01
-    mac_address: 'C4:7C:8D:6B:48:A6'
-    temperature:
-      name: "Xiaomi HHCCJCY01 :48:A6 Temperature"
-    moisture:
-      name: "Xiaomi HHCCJCY01 :48:A6 Moisture"
-    illuminance:
-      name: "Xiaomi HHCCJCY01 :48:A6 Illuminance"
-    conductivity:
-      name: "Xiaomi HHCCJCY01 :48:A6 Soil Conductivity"
+bluetooth_proxy:
+
+# sensor:
+#   - platform: xiaomi_hhccjcy01
+#     mac_address: 'C4:7C:8D:6B:48:63'
+#     temperature:
+#       name: "Xiaomi HHCCJCY01 :48:63 Temperature"
+#     moisture:
+#       name: "Xiaomi HHCCJCY01 :48:63 Moisture"
+#     illuminance:
+#       name: "Xiaomi HHCCJCY01 :48:63 Illuminance"
+#     conductivity:
+#       name: "Xiaomi HHCCJCY01 :48:63 Soil Conductivity"
+#   - platform: xiaomi_hhccjcy01
+#     mac_address: 'C4:7C:8D:6B:48:A6'
+#     temperature:
+#       name: "Xiaomi HHCCJCY01 :48:A6 Temperature"
+#     moisture:
+#       name: "Xiaomi HHCCJCY01 :48:A6 Moisture"
+#     illuminance:
+#       name: "Xiaomi HHCCJCY01 :48:A6 Illuminance"
+#     conductivity:
+#       name: "Xiaomi HHCCJCY01 :48:A6 Soil Conductivity"
