@@ -1,0 +1,124 @@
+substitutions:
+  friendly_name: Energy meter
+  pulse_pin: "12"
+  status_led: "14"
+  yellow_led: "27"
+  pulse_rate: "1000"
+
+esphome:
+  name: energy_meter
+  platform: ESP32
+  board: featheresp32
+
+wifi:
+  ssid: "Dahl_Faro"
+  password: "FamiljenDahl9409239304"
+  ap:
+    ssid: "energy_meter"
+
+captive_portal:
+logger:
+improv_serial:
+
+# Enable Home Assistant API
+api:
+  services:
+    - service: reset_total_energy
+      then:
+        - button.press:
+            id: button_reset_total
+
+ota:
+  safe_mode: true
+  reboot_timeout: 10min
+  num_attempts: 5
+
+output:
+  - platform: gpio
+    pin: ${yellow_led}
+    id: output_yellow
+
+light:
+  - platform: binary
+    internal: true
+    id: led_yellow
+    name: Yellow LED
+    output: output_yellow
+
+status_led:
+  pin:
+    number: ${status_led}
+
+button:
+  - platform: restart
+    name: "Restart"
+  - platform: template
+    name: "Reset - Total Energy"
+    id: button_reset_total
+    on_press:
+      - pulse_meter.set_total_pulses:
+          id: power
+          value: 0
+
+text_sensor:
+  - platform: version
+    hide_timestamp: true
+    name: "${friendly_name} - ESPHome Version"
+  - platform: wifi_info
+    ip_address:
+      name: "${friendly_name} - IP Address"
+      icon: mdi:wifi
+    ssid:
+      name: "${friendly_name} - Connected SSID"
+      icon: mdi:wifi-strength-2
+
+sensor:
+  - platform: wifi_signal
+    name: "${friendly_name} - WiFi Signal"
+    update_interval: 120s
+
+  - platform: pulse_meter
+    name: "${friendly_name} - Power Consumption"
+    id: power
+    unit_of_measurement: "W"
+    state_class: measurement
+    device_class: power
+    icon: mdi:flash-outline
+    accuracy_decimals: 0
+    pin: ${pulse_pin}
+    internal_filter: 100ms
+    on_raw_value:
+      then:
+        - light.turn_on:
+            id: led_yellow
+        - delay: 0.2s
+        - light.turn_off:
+            id: led_yellow
+    filters:
+      - lambda: return x * ((60.0 / ${pulse_rate}) * 1000.0);
+    total:
+      name: "${friendly_name} - Total Energy"
+      id: total_energy
+      unit_of_measurement: "kWh"
+      icon: mdi:circle-slice-3
+      state_class: total_increasing
+      device_class: energy
+      accuracy_decimals: 3
+      filters:
+        - lambda: return x * (1.0 / ${pulse_rate});
+
+  - platform: total_daily_energy
+    name: "${friendly_name} - Daily Energy"
+    id: daily_energy
+    power_id: power
+    unit_of_measurement: "kWh"
+    icon: mdi:circle-slice-3
+    state_class: total_increasing
+    device_class: energy
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+
+time:
+  - platform: sntp
+    id: my_time

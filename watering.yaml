@@ -1,0 +1,42 @@
+esphome:
+  name: watering
+  platform: ESP32
+  board: featheresp32
+
+wifi:
+  ssid: "Jifi"
+  password: "DuTrorAttJagSover"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Watering Fallback Hotspot"
+    password: "PdSQbcRkX8YG"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 21
+      mode: INPUT_PULLUP
+    name: "Flottör"
+
+sensor:
+  - platform: hx711
+    name: "Vågen (g)"
+    dout_pin: 27
+    clk_pin: 12
+    update_interval: 15s
+    unit_of_measurement: g
+    filters:
+      - calibrate_linear:
+          - 106994 -> 0
+          - 120130 -> 2000
