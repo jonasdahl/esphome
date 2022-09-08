@@ -10,7 +10,6 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Jonas Bed Fallback Hotspot"
-    password: "F330kLxAMfag"
 
 captive_portal:
 

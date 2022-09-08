@@ -10,11 +10,15 @@ esphome:
   platform: ESP32
   board: featheresp32
 
+
 wifi:
-  ssid: "Dahl_Faro"
-  password: "FamiljenDahl9409239304"
+  ssid: "Jifi IoT"
+  password: !secret wifi_password
   ap:
     ssid: "energy_meter"
+
+esp32_ble_tracker:
+bluetooth_proxy:
 
 captive_portal:
 logger:
