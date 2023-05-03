@@ -1,0 +1,64 @@
+esphome:
+  name: lampis2
+  friendly_name: Lampis Två
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret encryption_key
+
+ota:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+light:
+  # https://esphome.io/components/light/index.html
+  # https://esphome.io/components/light/neopixelbus.html
+  - name: "144 LEDs"
+    restore_mode: RESTORE_DEFAULT_ON
+    id: leds
+    num_leds: 144
+    platform: neopixelbus
+    type: GRB
+    variant: WS2812
+    method:
+      type: esp8266_dma # only on GPIO3
+    pin: GPIO3 # "RX" on the the d1 mini
+
+    effects:
+      - random:
+      # - wled:
+      - addressable_rainbow:
+      - addressable_color_wipe:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+      - addressable_lambda:
+          name: "Saftis"
+          update_interval: 16ms
+          lambda: |-
+            static uint16_t width = 14;
+            static uint16_t pos = 0;
+
+            it.all() = Color::Black;
+
+            uint16_t end_pos = pos + width;
+            if (end_pos > 144) {
+              uint16_t overflow = end_pos - 144;
+              it.range(0, overflow) = current_color;
+              end_pos = 144;
+            }
+
+            it.range(pos, end_pos) = current_color;
+
+            pos = (pos + 1) % 144;
