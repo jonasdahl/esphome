@@ -24,7 +24,7 @@ light:
   # https://esphome.io/components/light/neopixelbus.html
   - name: "144 LEDs"
     restore_mode: RESTORE_DEFAULT_ON
-    id: leds
+    id: 144_leds
     num_leds: 144
     platform: neopixelbus
     type: GRB
@@ -37,6 +37,8 @@ light:
       - random:
       # - wled:
       - addressable_rainbow:
+          speed: 5
+          width: 144
       - addressable_color_wipe:
       - addressable_scan:
       - addressable_twinkle:
@@ -62,3 +64,11 @@ light:
             it.range(pos, end_pos) = current_color;
 
             pos = (pos + 1) % 144;
+
+binary_sensor:
+  - platform: gpio
+    pin: D1
+    id: "light-toggle"
+    on_click:
+      then:
+        - light.toggle: 144_leds
