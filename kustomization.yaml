@@ -7,3 +7,4 @@ configMapGenerator:
   - flora_gw.yaml
   - kitchen_lights.yaml
   - watering.yaml
+  - lampis2.yaml
