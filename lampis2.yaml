@@ -68,7 +68,8 @@ light:
 binary_sensor:
   - platform: gpio
     pin: D1
-    id: "light-toggle"
+    id: button
+    internal: true
     on_click:
       then:
         - light.toggle: all_the_leds
