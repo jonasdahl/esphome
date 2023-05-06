@@ -22,9 +22,9 @@ wifi:
 light:
   # https://esphome.io/components/light/index.html
   # https://esphome.io/components/light/neopixelbus.html
-  - name: "144 LEDs"
+  - name: "Lampis Två"
     restore_mode: RESTORE_DEFAULT_ON
-    id: 144_leds
+    id: all_the_leds
     num_leds: 144
     platform: neopixelbus
     type: GRB
@@ -71,4 +71,4 @@ binary_sensor:
     id: "light-toggle"
     on_click:
       then:
-        - light.toggle: 144_leds
+        - light.toggle: all_the_leds
