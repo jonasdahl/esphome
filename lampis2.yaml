@@ -23,7 +23,6 @@ light:
   # https://esphome.io/components/light/index.html
   # https://esphome.io/components/light/neopixelbus.html
   - name: "Lampis Två"
-    restore_mode: RESTORE_DEFAULT_ON
     id: all_the_leds
     num_leds: 144
     platform: neopixelbus
@@ -52,7 +51,7 @@ light:
             static uint16_t width = 14;
             static uint16_t pos = 0;
 
-            it.all() = Color::Black;
+            it.all() = Color::BLACK;
 
             uint16_t end_pos = pos + width;
             if (end_pos > 144) {
@@ -67,9 +66,13 @@ light:
 
 binary_sensor:
   - platform: gpio
-    pin: D1
+    pin:
+      number: D1
+      mode:
+        input: true
+        pullup: true
+      inverted: true
     id: button
-    internal: true
     on_click:
       then:
         - light.toggle: all_the_leds
