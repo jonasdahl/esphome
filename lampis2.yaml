@@ -66,13 +66,58 @@ light:
 
 binary_sensor:
   - platform: gpio
+    id: button
     pin:
       number: D1
       mode:
         input: true
         pullup: true
       inverted: true
-    id: button
-    on_click:
+
+    on_multi_click:
+    # single
+    - timing:
+        - ON for at most 0.5s
+        - OFF for at least 0.5s
       then:
-        - light.toggle: all_the_leds
+        - light.control:
+            id: all_the_leds
+            state: on
+            effect: rainbow
+            brightness: 50%
+
+    # single long
+    - timing:
+        - ON for 0.5s to 2s
+        - OFF for at least 0.5s
+      then:
+        - light.control:
+            id: all_the_leds
+            state: on
+            effect: random
+            brightness: 50%
+
+    # double
+    - timing:
+        - ON for at most 0.5s
+        - OFF for at most 0.5s
+        - ON for at most 0.5s
+        - OFF for at least 0.5s
+      then:
+        - light.turn_off: all_the_leds
+
+    # click-release-hold
+    - timing:
+        - ON for at most 0.5s
+        - OFF for at most 0.5s
+        - ON for at least 0.5s
+      then:
+        - while:
+            condition:
+              binary_sensor.is_on: button
+            then:
+              - light.dim_relative:
+                  id: all_the_leds
+                  relative_brightness: 5%
+                  transition_length: 0.1s
+              - delay: 0.1s
