@@ -31,8 +31,13 @@ dallas:
   - pin: 18
     update_interval: 30s
 
-# Individual sensors
 sensor:
+  # Wifi signal sensor.
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+
+  # Individual temp sensors
   - platform: dallas
     address: 0x2b3ce1e381910928
     name: "0x2b3ce1e381910928"
@@ -63,7 +68,6 @@ sensor:
   - platform: dallas
     address: 0x633ce1e3813eb728
     name: "0x633ce1e3813eb728"
-
   - platform: dallas
     address: 0x0a27cc9d1e64ff28
     name: "0x0a27cc9d1e64ff28"
@@ -76,7 +80,6 @@ sensor:
   - platform: dallas
     address: 0x4213599c1e64ff28
     name: "0x4213599c1e64ff28"
-
   - platform: dallas
     address: 0x22104e9c1e64ff28
     name: "0x22104e9c1e64ff28"
@@ -95,3 +98,17 @@ sensor:
   - platform: dallas
     address: 0xea55f19d1e64ff28
     name: "0xea55f19d1e64ff28"
+
+# Wifi text sensors
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+    ssid:
+      name: Connected SSID
+    bssid:
+      name: Connected BSSID
+    mac_address:
+      name: Mac Wifi Address
+    scan_results:
+      name: Latest Scan Results
