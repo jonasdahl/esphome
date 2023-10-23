@@ -15,7 +15,8 @@ ota:
   password: ""
 
 wifi:
-  ssid: "Dahl_Faro"
+  ssid: !secret ssid
+  password: !secret wifi_password
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
