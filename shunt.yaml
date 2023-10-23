@@ -1,0 +1,151 @@
+esphome:
+  name: shunt
+
+esp8266:
+  board: d1_mini_pro
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  password: ""
+
+wifi:
+  ssid: "Dahl_Faro"
+  password: "FamiljenDahl9409239304"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Shunt Fallback Hotspot"
+
+captive_portal:
+
+light:
+  - platform: status_led
+    name: "Status LED"
+    pin: 12
+
+# Temp sensors
+dallas:
+  - pin: 14
+    update_interval: 5s
+
+sensor:
+  # Wifi signal sensor.
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+
+  # Individual temp sensors
+  - id: temp_framledning
+    platform: dallas
+    address: 0xb4000001c7662728
+    name: "Temperatur framledning"
+    filters:
+      - filter_out: 85.0
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+  - id: temp_2
+    platform: dallas
+    address: 0xa8000001c765fe28
+    name: "Temperatur 2"
+    filters:
+      - filter_out: 85.0
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+  - id: temp_3
+    platform: dallas
+    address: 0x34000001c7668328
+    name: "Temperatur 3"
+    filters:
+      - filter_out: 85.0
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+  - id: temp_4
+    platform: dallas
+    address: 0x78000001c7693c28
+    name: "Temperatur 4"
+    filters:
+      - filter_out: 85.0
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+  # PID Debug
+  - platform: pid
+    name: "PID Debug: Result"
+    type: RESULT
+  - platform: pid
+    name: "PID Debug: Error"
+    type: ERROR
+  - platform: pid
+    name: "PID Debug: P term"
+    type: PROPORTIONAL
+  - platform: pid
+    name: "PID Debug: I term"
+    type: INTEGRAL
+  - platform: pid
+    name: "PID Debug: D term"
+    type: DERIVATIVE
+  - platform: pid
+    name: "PID Debug: Current shunt value"
+    type: HEAT
+  - platform: pid
+    name: "PID Debug: P factor"
+    type: KP
+  - platform: pid
+    name: "PID Debug: I factor"
+    type: KP
+  - platform: pid
+    name: "PID Debug: D factor"
+    type: KD
+
+# Wifi text sensors
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+    ssid:
+      name: Connected SSID
+    bssid:
+      name: Connected BSSID
+    mac_address:
+      name: Mac Wifi Address
+    scan_results:
+      name: Latest Scan Results
+
+# Shunt output
+output:
+  - platform: esp8266_pwm
+    pin: 16
+    frequency: 1000 Hz
+    id: shunt_control
+
+# PID
+climate:
+  - platform: pid
+    name: "Shunt"
+    id: shunt
+    sensor: temp_framledning
+    default_target_temperature: 21°C
+    heat_output: shunt_control
+    control_parameters:
+      kp: 1
+      ki: 0.1
+      kd: 0.1
+      output_averaging_samples: 5 # smooth the output over 5 samples
+      derivative_averaging_samples: 5 # smooth the derivative value over 10 samples
+    deadband_parameters: # deadband within +/-0.5°C of target_temperature
+      threshold_high: 0.1°C
+      threshold_low: -0.1°C
+button:
+  - platform: template
+    name: "PID Autotune"
+    on_press:
+      - climate.pid.autotune: shunt
