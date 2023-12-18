@@ -30,6 +30,10 @@ captive_portal:
 dallas:
   - pin: 18
     update_interval: 30s
+    id: slow
+  - pin: 19
+    update_interval: 5s
+    id: fast
 
 sensor:
   # Wifi signal sensor.
@@ -41,63 +45,150 @@ sensor:
   - platform: dallas
     address: 0x2b3ce1e381910928
     name: "0x2b3ce1e381910928"
+    dallas_id: slow
   - platform: dallas
     address: 0x6a3ce1e381435f28
     name: "0x6a3ce1e381435f28"
+    dallas_id: slow
   - platform: dallas
     address: 0xf63ce1e381c57328
     name: "0xf63ce1e381c57328"
+    dallas_id: slow
   - platform: dallas
     address: 0x1b3ce1e38148da28
     name: "0x1b3ce1e38148da28"
+    dallas_id: slow
   - platform: dallas
     address: 0x483ce1e381427c28
     name: "0x483ce1e381427c28"
+    dallas_id: slow
   - platform: dallas
     address: 0x593ce1e381261828
     name: "0x593ce1e381261828"
+    dallas_id: slow
   - platform: dallas
     address: 0x163ce1e38185ba28
     name: "0x163ce1e38185ba28"
+    dallas_id: slow
   - platform: dallas
     address: 0x5c3ce1e381f05e28
     name: "0x5c3ce1e381f05e28"
+    dallas_id: slow
   - platform: dallas
     address: 0xe63ce1e3812e3928
     name: "0xe63ce1e3812e3928"
+    dallas_id: slow
   - platform: dallas
     address: 0x633ce1e3813eb728
     name: "0x633ce1e3813eb728"
+    dallas_id: slow
   - platform: dallas
     address: 0x0a27cc9d1e64ff28
     name: "0x0a27cc9d1e64ff28"
+    dallas_id: slow
   - platform: dallas
     address: 0x7db44c9c1e64ff28
     name: "0x7db44c9c1e64ff28"
+    dallas_id: slow
   - platform: dallas
     address: 0x57a74f9c1e64ff28
     name: "0x57a74f9c1e64ff28"
+    dallas_id: slow
   - platform: dallas
     address: 0x4213599c1e64ff28
     name: "0x4213599c1e64ff28"
+    dallas_id: slow
   - platform: dallas
     address: 0x22104e9c1e64ff28
     name: "0x22104e9c1e64ff28"
-  - platform: dallas
+    dallas_id: slow
+
+  - id: temp_framledning
+    platform: dallas
     address: 0xf4d66e9c1e64ff28
-    name: "0xf4d66e9c1e64ff28"
+    name: "0xf4d66e9c1e64ff28 - fast"
+    dallas_id: fast #!!!!
+    filters:
+      - filter_out: 85.0
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 1
+
   - platform: dallas
     address: 0xa2435d9c1e64ff28
     name: "0xa2435d9c1e64ff28"
+    dallas_id: slow
   - platform: dallas
     address: 0xc9605b9c1e64ff28
     name: "0xc9605b9c1e64ff28"
+    dallas_id: slow
   - platform: dallas
     address: 0x4ab0f99d1e64ff28
     name: "0x4ab0f99d1e64ff28"
+    dallas_id: slow
   - platform: dallas
     address: 0xea55f19d1e64ff28
     name: "0xea55f19d1e64ff28"
+    dallas_id: slow
+
+  - platform: dallas
+    address: 0xb4000001c7662728
+    name: "Temp framledning"
+    dallas_id: slow
+  - platform: dallas
+    address: 0xa8000001c765fe28
+    name: "Temp 2"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x34000001c7668328
+    name: "Temp 3"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x78000001c7693c28
+    name: "Temp 4"
+    dallas_id: slow
+
+  # Debug
+  - platform: pid
+    name: "PID Climate Result"
+    type: RESULT
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Error"
+    type: ERROR
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Propotional Term"
+    type: PROPORTIONAL
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Integral Term"
+    type: INTEGRAL
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Derivative Term"
+    type: DERIVATIVE
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Heating Power"
+    type: HEAT
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Cooling Power"
+    type: COOL
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Propotional Factor (KP)"
+    type: KP
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Integral Factor (KI)"
+    type: KI
+    entity_category: diagnostic
+  - platform: pid
+    name: "PID Climate Derivative Factor (KD)"
+    type: KD
+    entity_category: diagnostic
 
 # Wifi text sensors
 text_sensor:
@@ -112,3 +203,43 @@ text_sensor:
       name: Mac Wifi Address
     scan_results:
       name: Latest Scan Results
+
+# Shunt output
+output:
+  - platform: ledc
+    pin: 23
+    frequency: 1000Hz
+    id: shunt_control
+
+# PID
+climate:
+  - platform: pid
+    name: "Shunt"
+    id: shunt
+    sensor: temp_framledning
+    default_target_temperature: 50
+    heat_output: shunt_control
+    control_parameters:
+      kp: 1
+      ki: 0.1
+      kd: 0.1
+      output_averaging_samples: 5 # smooth the output over 5 samples
+      derivative_averaging_samples: 5 # smooth the derivative value over 10 samples
+    deadband_parameters: # deadband within +/-0.5°C of target_temperature
+      threshold_high: 0.1°C
+      threshold_low: -0.1°C
+    visual:
+      min_temperature: 15
+      max_temperature: 70
+      temperature_step:
+        target_temperature: 0.5
+        current_temperature: 0.1
+
+# Button for tuning PID
+button:
+  - platform: template
+    name: "PID Autotune"
+    on_press:
+      - climate.pid.autotune: shunt
+  - platform: restart
+    name: "Reboot"

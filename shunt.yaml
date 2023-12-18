@@ -33,6 +33,10 @@ light:
 dallas:
   - pin: 14
     update_interval: 5s
+    id: fast
+  - pin: 13
+    update_interval: 30s
+    id: slow
 
 sensor:
   # Wifi signal sensor.
@@ -45,38 +49,109 @@ sensor:
     platform: dallas
     address: 0xb4000001c7662728
     name: "Temperatur framledning"
+    dallas_id: fast
     filters:
       - filter_out: 85.0
       - sliding_window_moving_average:
           window_size: 3
           send_every: 1
-  - id: temp_2
+  - id: "t0xa8000001c765fe28" # Temp 2
     platform: dallas
     address: 0xa8000001c765fe28
-    name: "Temperatur 2"
-    filters:
-      - filter_out: 85.0
-      - sliding_window_moving_average:
-          window_size: 3
-          send_every: 1
-  - id: temp_3
+    name: "0xa8000001c765fe28"
+    dallas_id: fast
+  - id: "t0x34000001c7668328" # Temp 3
     platform: dallas
     address: 0x34000001c7668328
-    name: "Temperatur 3"
-    filters:
-      - filter_out: 85.0
-      - sliding_window_moving_average:
-          window_size: 3
-          send_every: 1
-  - id: temp_4
+    name: "0x34000001c7668328"
+    dallas_id: fast
+  - id: "t0x78000001c7693c28" # Temp 4
     platform: dallas
     address: 0x78000001c7693c28
-    name: "Temperatur 4"
-    filters:
-      - filter_out: 85.0
-      - sliding_window_moving_average:
-          window_size: 3
-          send_every: 1
+    name: "0x78000001c7693c28"
+    dallas_id: fast
+
+  - platform: dallas
+    address: 0x2b3ce1e381910928
+    name: "0x2b3ce1e381910928"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x6a3ce1e381435f28
+    name: "0x6a3ce1e381435f28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0xf63ce1e381c57328
+    name: "0xf63ce1e381c57328"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x1b3ce1e38148da28
+    name: "0x1b3ce1e38148da28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x483ce1e381427c28
+    name: "0x483ce1e381427c28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x593ce1e381261828
+    name: "0x593ce1e381261828"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x163ce1e38185ba28
+    name: "0x163ce1e38185ba28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x5c3ce1e381f05e28
+    name: "0x5c3ce1e381f05e28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0xe63ce1e3812e3928
+    name: "0xe63ce1e3812e3928"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x633ce1e3813eb728
+    name: "0x633ce1e3813eb728"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x0a27cc9d1e64ff28
+    name: "0x0a27cc9d1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x7db44c9c1e64ff28
+    name: "0x7db44c9c1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x57a74f9c1e64ff28
+    name: "0x57a74f9c1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x4213599c1e64ff28
+    name: "0x4213599c1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x22104e9c1e64ff28
+    name: "0x22104e9c1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0xf4d66e9c1e64ff28
+    name: "0xf4d66e9c1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0xa2435d9c1e64ff28
+    name: "0xa2435d9c1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0xc9605b9c1e64ff28
+    name: "0xc9605b9c1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0x4ab0f99d1e64ff28
+    name: "0x4ab0f99d1e64ff28"
+    dallas_id: slow
+  - platform: dallas
+    address: 0xea55f19d1e64ff28
+    name: "0xea55f19d1e64ff28"
+    dallas_id: slow
+
   # PID Debug
   - platform: pid
     name: "PID Debug: Result"
