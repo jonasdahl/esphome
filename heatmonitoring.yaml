@@ -28,10 +28,10 @@ captive_portal:
 
 # Example configuration entry
 dallas:
-  - pin: 18
+  - pin: 15
     update_interval: 30s
     id: slow
-  - pin: 19
+  - pin: 17
     update_interval: 5s
     id: fast
 
@@ -207,7 +207,7 @@ text_sensor:
 # Shunt output
 output:
   - platform: ledc
-    pin: 23
+    pin: 22
     frequency: 1000Hz
     id: shunt_control
 
