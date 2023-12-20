@@ -1,5 +1,10 @@
 esphome:
   name: heatmonitoring
+  on_boot:
+    priority: 600
+    then:
+      - script.stop: turn_on_screen_with_timeout
+      - script.execute: turn_on_screen_with_timeout
 
 esp32:
   board: esp32dev
@@ -24,7 +29,129 @@ wifi:
   ap:
     ssid: "Heatmonitoring Fallback Hotspot"
 
+  domain: .localdomain
+
 captive_portal:
+
+spi:
+  clk_pin: 14
+  mosi_pin: 12
+  miso_pin: 13
+
+color:
+  - id: my_red
+    red: 100%
+    green: 0%
+    blue: 0%
+  - id: my_green
+    red: 0%
+    green: 100%
+    blue: 0%
+  - id: my_blue
+    red: 0%
+    green: 0%
+    blue: 100%
+  - id: my_yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+
+font:
+  - file: "gfonts://Roboto"
+    id: roboto
+    size: 20
+
+display:
+  - platform: ili9xxx
+    id: my_display
+    model: ili9341
+    cs_pin: 26
+    dc_pin: 27
+    # reset_pin: 25
+    # backlight_pin: 16
+    rotation: 90
+
+    pages:
+      - id: tankar
+        lambda: |-
+          auto off_black = Color(20, 20, 20);
+          auto line_height = it.get_height() / 6;
+          it.filled_rectangle(0, 0, it.get_width(), it.get_height(), off_black);
+
+          auto col_1_left = 2 * it.get_width() / 3;
+
+          it.printf(0,                  0 * line_height, id(roboto), "Tankar");
+          it.printf(col_1_left,         0 * line_height, id(roboto), TextAlign::TOP_RIGHT, "Tank 1");
+          it.printf(it.get_width(),     0 * line_height, id(roboto), TextAlign::TOP_RIGHT, "Tank 2");
+
+          it.printf(0, 1 * line_height, id(roboto), "Topp:");
+          it.printf(0, 2 * line_height, id(roboto), "Mitten:");
+          it.printf(0, 3 * line_height, id(roboto), "Botten:");
+
+          it.printf(col_1_left,         1 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0x5c3ce1e381f05e28).state);
+          it.printf(col_1_left,         2 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0xe63ce1e3812e3928).state);
+          it.printf(col_1_left,         3 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0x633ce1e3813eb728).state);
+
+          it.printf(it.get_width(), 1 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0x0a27cc9d1e64ff28).state);
+          it.printf(it.get_width(), 2 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0x7db44c9c1e64ff28).state);
+          it.printf(it.get_width(), 3 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0x57a74f9c1e64ff28).state);
+
+      - id: shunt_info
+        lambda: |-
+          auto off_black = Color(20, 20, 20);
+          auto line_height = it.get_height() / 6;
+          it.filled_rectangle(0, 0, it.get_width(), it.get_height(), off_black);
+
+          it.printf(0, 0 * line_height, id(roboto), "Framledning:");
+          it.printf(it.get_width(), 0 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_framledning).state);
+
+          it.printf(0, 1 * line_height, id(roboto), "Retur:");
+          it.printf(it.get_width(), 1 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0x4213599c1e64ff28).state);
+
+          it.printf(0, 2 * line_height, id(roboto), "Delta:");
+          it.printf(it.get_width(), 2 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_framledning).state - id(temp_0x4213599c1e64ff28).state);
+
+switch:
+  - platform: gpio
+    id: backlight
+    pin:
+      number: 25
+      mode:
+        pulldown: true
+        output: true
+    name: "Backlight"
+    on_turn_on:
+      - script.stop: turn_on_screen_with_timeout
+      - script.execute: turn_on_screen_with_timeout
+    on_turn_off:
+      - script.stop: turn_on_screen_with_timeout
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 33
+      inverted: true
+      mode:
+        pullup: true
+        input: true
+    name: "Button 1"
+    on_press:
+      then:
+        - if:
+            condition:
+              - switch.is_off: backlight
+            then:
+              - script.stop: turn_on_screen_with_timeout
+              - script.execute: turn_on_screen_with_timeout
+            else:
+              - display.page.show_next: my_display
+              - component.update: my_display
+script:
+  - id: turn_on_screen_with_timeout
+    then:
+      - switch.turn_on: backlight
+      - delay: "00:00:05"
+      - switch.turn_off: backlight
 
 # Example configuration entry
 dallas:
@@ -45,62 +172,77 @@ sensor:
   - platform: dallas
     address: 0x2b3ce1e381910928
     name: "0x2b3ce1e381910928"
+    id: "temp_0x2b3ce1e381910928"
     dallas_id: slow
   - platform: dallas
     address: 0x6a3ce1e381435f28
     name: "0x6a3ce1e381435f28"
+    id: "temp_0x6a3ce1e381435f28"
     dallas_id: slow
   - platform: dallas
     address: 0xf63ce1e381c57328
     name: "0xf63ce1e381c57328"
+    id: "temp_0xf63ce1e381c57328"
     dallas_id: slow
   - platform: dallas
     address: 0x1b3ce1e38148da28
     name: "0x1b3ce1e38148da28"
+    id: "temp_0x1b3ce1e38148da28"
     dallas_id: slow
   - platform: dallas
     address: 0x483ce1e381427c28
     name: "0x483ce1e381427c28"
+    id: "temp_0x483ce1e381427c28"
     dallas_id: slow
   - platform: dallas
     address: 0x593ce1e381261828
     name: "0x593ce1e381261828"
+    id: "temp_0x593ce1e381261828"
     dallas_id: slow
   - platform: dallas
     address: 0x163ce1e38185ba28
     name: "0x163ce1e38185ba28"
+    id: "temp_0x163ce1e38185ba28"
     dallas_id: slow
   - platform: dallas
     address: 0x5c3ce1e381f05e28
     name: "0x5c3ce1e381f05e28"
+    id: "temp_0x5c3ce1e381f05e28"
     dallas_id: slow
   - platform: dallas
     address: 0xe63ce1e3812e3928
     name: "0xe63ce1e3812e3928"
+    id: "temp_0xe63ce1e3812e3928"
     dallas_id: slow
   - platform: dallas
     address: 0x633ce1e3813eb728
     name: "0x633ce1e3813eb728"
+    id: "temp_0x633ce1e3813eb728"
     dallas_id: slow
   - platform: dallas
     address: 0x0a27cc9d1e64ff28
     name: "0x0a27cc9d1e64ff28"
+    id: "temp_0x0a27cc9d1e64ff28"
     dallas_id: slow
   - platform: dallas
     address: 0x7db44c9c1e64ff28
     name: "0x7db44c9c1e64ff28"
+    id: "temp_0x7db44c9c1e64ff28"
     dallas_id: slow
   - platform: dallas
     address: 0x57a74f9c1e64ff28
     name: "0x57a74f9c1e64ff28"
+    id: "temp_0x57a74f9c1e64ff28"
     dallas_id: slow
   - platform: dallas
     address: 0x4213599c1e64ff28
     name: "0x4213599c1e64ff28"
+    id: "temp_0x4213599c1e64ff28"
     dallas_id: slow
   - platform: dallas
     address: 0x22104e9c1e64ff28
     name: "0x22104e9c1e64ff28"
+    id: "temp_0x22104e9c1e64ff28"
     dallas_id: slow
 
   - id: temp_framledning
@@ -117,18 +259,22 @@ sensor:
   - platform: dallas
     address: 0xa2435d9c1e64ff28
     name: "0xa2435d9c1e64ff28"
+    id: "temp_0xa2435d9c1e64ff28"
     dallas_id: slow
   - platform: dallas
     address: 0xc9605b9c1e64ff28
     name: "0xc9605b9c1e64ff28"
+    id: "temp_0xc9605b9c1e64ff28"
     dallas_id: slow
   - platform: dallas
     address: 0x4ab0f99d1e64ff28
     name: "0x4ab0f99d1e64ff28"
+    id: "temp_0x4ab0f99d1e64ff28"
     dallas_id: slow
   - platform: dallas
     address: 0xea55f19d1e64ff28
     name: "0xea55f19d1e64ff28"
+    id: "temp_0xea55f19d1e64ff28"
     dallas_id: slow
 
   - platform: dallas
