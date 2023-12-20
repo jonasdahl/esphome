@@ -1,0 +1,239 @@
+esphome:
+  name: screen
+
+esp32:
+  board: featheresp32
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  password: ""
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Screen Fallback Hotspot"
+
+captive_portal:
+
+button:
+  - platform: restart
+    name: "Reboot"
+
+spi:
+  clk_pin: 5
+  mosi_pin: 18
+  miso_pin: 19
+
+color:
+  - id: my_red
+    red: 100%
+    green: 0%
+    blue: 0%
+  - id: my_green
+    red: 0%
+    green: 100%
+    blue: 0%
+  - id: my_blue
+    red: 0%
+    green: 0%
+    blue: 100%
+  - id: my_yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+
+font:
+  - file: "gfonts://Roboto"
+    id: roboto
+    size: 20
+
+display:
+  - platform: ili9xxx
+    id: my_display
+    model: ili9341
+    cs_pin: 33
+    dc_pin: 4
+    reset_pin: 16
+    # backlight_pin: 16
+    rotation: 90
+
+    pages:
+      - id: tankar
+        lambda: |-
+          auto off_black = Color(20, 20, 20);
+          auto line_height = it.get_height() / 6;
+          it.filled_rectangle(0, 0, it.get_width(), it.get_height(), off_black);
+
+          auto col_1_left = 2 * it.get_width() / 3;
+
+          it.printf(0,                  0 * line_height, id(roboto), "Tankar");
+          it.printf(col_1_left,         0 * line_height, id(roboto), TextAlign::TOP_RIGHT, "Tank 1");
+          it.printf(it.get_width(),     0 * line_height, id(roboto), TextAlign::TOP_RIGHT, "Tank 2");
+
+          it.printf(0, 1 * line_height, id(roboto), "Topp:");
+          it.printf(0, 2 * line_height, id(roboto), "Mitten:");
+          it.printf(0, 3 * line_height, id(roboto), "Botten:");
+
+          it.printf(col_1_left,         1 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_tank_1_top).state);
+          it.printf(col_1_left,         2 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_tank_1_middle).state);
+          it.printf(col_1_left,         3 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_tank_1_bottom).state);
+
+          it.printf(it.get_width(), 1 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_tank_2_top).state);
+          it.printf(it.get_width(), 2 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_tank_2_middle).state);
+          it.printf(it.get_width(), 3 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_tank_2_bottom).state);
+
+      - id: shunt
+        lambda: |-
+          auto off_black = Color(20, 20, 20);
+          auto line_height = it.get_height() / 6;
+          it.filled_rectangle(0, 0, it.get_width(), it.get_height(), off_black);
+
+          it.printf(0, 0 * line_height, id(roboto), "Framledning:");
+          it.printf(it.get_width(), 0 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_framledning).state);
+
+          it.printf(0, 1 * line_height, id(roboto), "Retur:");
+          it.printf(it.get_width(), 1 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_retur).state);
+
+          it.printf(0, 2 * line_height, id(roboto), "Delta:");
+          it.printf(it.get_width(), 2 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_framledning).state - id(temp_retur).state);
+
+      # - id: graph_page
+      #   lambda: |-
+      #     auto off_black = Color(20, 20, 20);
+      #     it.filled_rectangle(0, 0, it.get_width(), it.get_height(), off_black);
+
+      #     it.graph(0, 0, id(multi_temperature_graph), my_yellow);
+
+# interval:
+#   - interval: 5s
+#     then:
+#       - display.page.show_next: my_display
+#       - component.update: my_display
+
+# graph:
+#   - id: multi_temperature_graph
+#     duration: 1h
+#     x_grid: 10min
+#     y_grid: 1.0 # degC/div
+#     width: 320
+#     height: 240
+#     traces:
+#       - sensor: temp_retur
+#         line_type: DASHED
+#         line_thickness: 2
+#         color: my_red
+#       - sensor: temp_framledning
+#         line_type: SOLID
+#         line_thickness: 3
+#         color: my_blue
+#       - sensor: temp_tank_2_bottom
+#         line_type: DOTTED
+#         line_thickness: 2
+#         color: my_green
+
+sensor:
+  - id: test_sensor
+    platform: homeassistant
+    name: "Temperature Sensor From Home Assistant"
+    entity_id: sensor.0xf4d66e9c1e64ff28_fast
+
+  - id: "temp_tank_1_top"
+    platform: homeassistant
+    entity_id: "sensor.0x5c3ce1e381f05e28"
+  - id: "temp_tank_1_middle"
+    platform: homeassistant
+    entity_id: "sensor.0xe63ce1e3812e3928"
+  - id: "temp_tank_1_bottom"
+    platform: homeassistant
+    entity_id: "sensor.0x633ce1e3813eb728"
+  - id: "temp_tank_2_top"
+    platform: homeassistant
+    entity_id: "sensor.0x0a27cc9d1e64ff28"
+  - id: "temp_tank_2_middle"
+    platform: homeassistant
+    entity_id: "sensor.0x7db44c9c1e64ff28"
+  - id: "temp_tank_2_bottom"
+    platform: homeassistant
+    entity_id: "sensor.0x57a74f9c1e64ff28"
+  - id: "temp_retur"
+    platform: homeassistant
+    entity_id: "sensor.0x4213599c1e64ff28"
+  # - id: ""
+  #platform: homeassistant
+  #   entity_id: "sensor.0x22104e9c1e64ff28"
+  - id: temp_framledning
+    platform: homeassistant
+    entity_id: "sensor.0xf4d66e9c1e64ff28_fast"
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 27
+      inverted: true
+      mode:
+        pullup: true
+        input: true
+    name: "Button #27"
+    on_press:
+      then:
+        - if:
+            condition:
+              - switch.is_off: backlight
+            then:
+              - script.stop: turn_on_screen_with_timeout
+              - script.execute: turn_on_screen_with_timeout
+            else:
+              - display.page.show_next: my_display
+              - component.update: my_display
+
+  - platform: gpio
+    pin:
+      number: 13
+      inverted: true
+      mode:
+        pullup: true
+        input: true
+    name: "Up"
+    on_press:
+      then:
+        - script.stop: turn_on_screen_with_timeout
+        - script.execute: turn_on_screen_with_timeout
+
+        - display.page.show_previous: my_display
+        - component.update: my_display
+
+switch:
+  - platform: gpio
+    id: backlight
+    pin:
+      number: 15
+      mode:
+        pulldown: true
+        output: true
+    name: "Backlight"
+
+script:
+  - id: turn_on_screen
+    then:
+      - switch.turn_on: backlight
+
+  - id: turn_off_screen
+    then:
+      - switch.turn_off: backlight
+
+  - id: turn_on_screen_with_timeout
+    then:
+      - script.execute: turn_on_screen
+      - delay: "00:01:00"
+      - script.execute: turn_off_screen
