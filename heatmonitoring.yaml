@@ -117,11 +117,6 @@ display:
           it.printf(0, 3 * line_height, id(roboto), "Delta:");
           it.printf(it.get_width(), 3 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_framledning).state - id(temp_0x4213599c1e64ff28).state);
 
-interval:
-  - interval: 5s
-    then:
-      display.page.show_next: my_display
-
 switch:
   - platform: gpio
     id: backlight
