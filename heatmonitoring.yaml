@@ -69,7 +69,7 @@ display:
     dc_pin: 27
     # reset_pin: 25
     # backlight_pin: 16
-    rotation: 90
+    rotation: 270
 
     pages:
       - id: tankar
@@ -105,11 +105,19 @@ display:
           it.printf(0, 0 * line_height, id(roboto), "Framledning:");
           it.printf(it.get_width(), 0 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_framledning).state);
 
-          it.printf(0, 1 * line_height, id(roboto), "Retur:");
-          it.printf(it.get_width(), 1 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0x4213599c1e64ff28).state);
+          it.printf(0, 1 * line_height, id(roboto), "Framledning inst.:");
+          it.printf(it.get_width(), 1 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(shunt).target_temperature);
 
-          it.printf(0, 2 * line_height, id(roboto), "Delta:");
-          it.printf(it.get_width(), 2 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_framledning).state - id(temp_0x4213599c1e64ff28).state);
+          it.printf(0, 2 * line_height, id(roboto), "Retur:");
+          it.printf(it.get_width(), 2 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_0x4213599c1e64ff28).state);
+
+          it.printf(0, 3 * line_height, id(roboto), "Delta:");
+          it.printf(it.get_width(), 3 * line_height, id(roboto), TextAlign::TOP_RIGHT, "%.1f°C", id(temp_framledning).state - id(temp_0x4213599c1e64ff28).state);
+
+interval:
+  - interval: 5s
+    then:
+      display.page.show_next: my_display
 
 switch:
   - platform: gpio
@@ -134,7 +142,64 @@ binary_sensor:
       mode:
         pullup: true
         input: true
+    name: "Button 3"
+    on_press:
+      then:
+        - if:
+            condition:
+              - switch.is_off: backlight
+            then:
+              - script.stop: turn_on_screen_with_timeout
+              - script.execute: turn_on_screen_with_timeout
+            else:
+              - display.page.show_next: my_display
+              - component.update: my_display
+  - platform: gpio
+    pin:
+      number: 32
+      inverted: true
+      mode:
+        pullup: true
+        input: true
     name: "Button 1"
+    on_press:
+      then:
+        - if:
+            condition:
+              - switch.is_off: backlight
+            then:
+              - script.stop: turn_on_screen_with_timeout
+              - script.execute: turn_on_screen_with_timeout
+            else:
+              - display.page.show_next: my_display
+              - component.update: my_display
+  - platform: gpio
+    pin:
+      number: 22
+      inverted: true
+      mode:
+        pullup: true
+        input: true
+    name: "Button 2"
+    on_press:
+      then:
+        - if:
+            condition:
+              - switch.is_off: backlight
+            then:
+              - script.stop: turn_on_screen_with_timeout
+              - script.execute: turn_on_screen_with_timeout
+            else:
+              - display.page.show_next: my_display
+              - component.update: my_display
+  - platform: gpio
+    pin:
+      number: 1
+      inverted: true
+      mode:
+        pullup: true
+        input: true
+    name: "Button 4"
     on_press:
       then:
         - if:
@@ -150,7 +215,7 @@ script:
   - id: turn_on_screen_with_timeout
     then:
       - switch.turn_on: backlight
-      - delay: "00:00:05"
+      - delay: "00:01:00"
       - switch.turn_off: backlight
 
 # Example configuration entry
@@ -366,9 +431,9 @@ climate:
     default_target_temperature: 50
     heat_output: shunt_control
     control_parameters:
-      kp: 1
-      ki: 0.1
-      kd: 0.1
+      kp: 0.1
+      ki: 0.01
+      kd: 0.01
       output_averaging_samples: 5 # smooth the output over 5 samples
       derivative_averaging_samples: 5 # smooth the derivative value over 10 samples
     deadband_parameters: # deadband within +/-0.5°C of target_temperature
@@ -389,3 +454,7 @@ button:
       - climate.pid.autotune: shunt
   - platform: restart
     name: "Reboot"
+  - platform: template
+    name: "Next page"
+    on_press:
+      - display.page.show_next: my_display
