@@ -1,3 +1,6 @@
+# Screen pinout https://learn.adafruit.com/assets/25554
+# ESP Pinout https://www.upesy.com/products/upesy-esp32-wroom-low-power-devkit
+
 esphome:
   name: heatmonitoring
   on_boot:
@@ -122,6 +125,7 @@ interval:
 switch:
   - platform: gpio
     id: backlight
+    entity_category: diagnostic
     pin:
       number: 25
       mode:
@@ -136,27 +140,9 @@ switch:
 
 binary_sensor:
   - platform: gpio
+    entity_category: diagnostic
     pin:
-      number: 33
-      inverted: true
-      mode:
-        pullup: true
-        input: true
-    name: "Button 3"
-    on_press:
-      then:
-        - if:
-            condition:
-              - switch.is_off: backlight
-            then:
-              - script.stop: turn_on_screen_with_timeout
-              - script.execute: turn_on_screen_with_timeout
-            else:
-              - display.page.show_next: my_display
-              - component.update: my_display
-  - platform: gpio
-    pin:
-      number: 32
+      number: 1
       inverted: true
       mode:
         pullup: true
@@ -174,8 +160,9 @@ binary_sensor:
               - display.page.show_next: my_display
               - component.update: my_display
   - platform: gpio
+    entity_category: diagnostic
     pin:
-      number: 22
+      number: 33
       inverted: true
       mode:
         pullup: true
@@ -193,8 +180,29 @@ binary_sensor:
               - display.page.show_next: my_display
               - component.update: my_display
   - platform: gpio
+    entity_category: diagnostic
     pin:
-      number: 1
+      number: 22
+      inverted: true
+      mode:
+        pullup: true
+        input: true
+    name: "Button 3"
+    on_press:
+      then:
+        - if:
+            condition:
+              - switch.is_off: backlight
+            then:
+              - script.stop: turn_on_screen_with_timeout
+              - script.execute: turn_on_screen_with_timeout
+            else:
+              - display.page.show_next: my_display
+              - component.update: my_display
+  - platform: gpio
+    entity_category: diagnostic
+    pin:
+      number: 32
       inverted: true
       mode:
         pullup: true
@@ -342,22 +350,22 @@ sensor:
     id: "temp_0xea55f19d1e64ff28"
     dallas_id: slow
 
-  - platform: dallas
-    address: 0xb4000001c7662728
-    name: "Temp framledning"
-    dallas_id: slow
-  - platform: dallas
-    address: 0xa8000001c765fe28
-    name: "Temp 2"
-    dallas_id: slow
-  - platform: dallas
-    address: 0x34000001c7668328
-    name: "Temp 3"
-    dallas_id: slow
-  - platform: dallas
-    address: 0x78000001c7693c28
-    name: "Temp 4"
-    dallas_id: slow
+  # - platform: dallas
+  #   address: 0xb4000001c7662728
+  #   name: "Temp framledning"
+  #   dallas_id: slow
+  # - platform: dallas
+  #   address: 0xa8000001c765fe28
+  #   name: "Temp 2"
+  #   dallas_id: slow
+  # - platform: dallas
+  #   address: 0x34000001c7668328
+  #   name: "Temp 3"
+  #   dallas_id: slow
+  # - platform: dallas
+  #   address: 0x78000001c7693c28
+  #   name: "Temp 4"
+  #   dallas_id: slow
 
   # Debug
   - platform: pid
@@ -450,11 +458,13 @@ climate:
 button:
   - platform: template
     name: "PID Autotune"
+    entity_category: diagnostic
     on_press:
       - climate.pid.autotune: shunt
   - platform: restart
     name: "Reboot"
   - platform: template
     name: "Next page"
+    entity_category: diagnostic
     on_press:
       - display.page.show_next: my_display
