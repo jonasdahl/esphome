@@ -1,0 +1,500 @@
+esphome:
+  name: ctc-ecozenith-i250
+esp32:
+  board: lolin_s2_mini
+  framework:
+    type: esp-idf
+logger: {}
+api:
+  password: ""
+ota:
+  - platform: esphome
+    password: ""
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: Ctc-Ecozenith-I250
+    password: uJIlEWvInhDB
+captive_portal: {}
+uart:
+  id: mod_bus
+  tx_pin: 17
+  rx_pin: 16
+  baud_rate: 9600
+  parity: EVEN
+  stop_bits: 1
+modbus:
+  flow_control_pin: 18
+  id: modbus1
+modbus_controller:
+  - id: ctc
+    address: 1
+    modbus_id: modbus1
+    setup_priority: -10
+sensor:
+  - filters:
+      - clamp:
+          min_value: "250"
+          max_value: "850"
+          ignore_out_of_range: true
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 212
+    register_type: holding
+    name: 'Heating circuit 1: Inclination'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - clamp:
+          min_value: "-200"
+          max_value: "200"
+          ignore_out_of_range: true
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 213
+    register_type: holding
+    name: 'Heating circuit 1: Adjustment'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - clamp:
+          min_value: "-400"
+          max_value: "0"
+          ignore_out_of_range: true
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 214
+    register_type: holding
+    name: 'Heating circuit 1: Decrease Primary flow temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - clamp:
+          min_value: "-400"
+          max_value: "0"
+          ignore_out_of_range: true
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 215
+    register_type: holding
+    name: 'Heating circuit 1: Decrease Room temperatue'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - clamp:
+          min_value: "250"
+          max_value: "850"
+          ignore_out_of_range: true
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 224
+    register_type: holding
+    name: 'Heating circuit 2: Inclination'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - clamp:
+          min_value: "-200"
+          max_value: "200"
+          ignore_out_of_range: true
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 225
+    register_type: holding
+    name: 'Heating circuit 2: Adjustment'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - clamp:
+          min_value: "-400"
+          max_value: "0"
+          ignore_out_of_range: true
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 226
+    register_type: holding
+    name: 'Heating circuit 2: Decrease Primary flow temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - clamp:
+          min_value: "-400"
+          max_value: "0"
+          ignore_out_of_range: true
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 227
+    register_type: holding
+    name: 'Heating circuit 2: Decrease Room temperatue'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 559
+    register_type: read
+    name: 'Heating circuit 1: Primary flow setpoint temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 560
+    register_type: read
+    name: 'Heating circuit 2: Primary flow setpoint temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 563
+    register_type: read
+    name: 'Lower tank: Setpoint temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 564
+    register_type: read
+    name: 'Upper tank: Setpoint temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 601
+    register_type: read
+    name: Upper tank temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 603
+    register_type: read
+    name: Lower tank temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 606
+    register_type: read
+    name: Outdoor temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 607
+    register_type: read
+    name: 'Heating circuit 1: Primary flow temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 608
+    register_type: read
+    name: 'Heating circuit 2: Primary flow temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 632
+    register_type: read
+    name: 'Heat pump 1: Flow temperature in'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 634
+    register_type: read
+    name: 'Heat pump 1: Flow temperature out'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 635
+    register_type: read
+    name: 'Heat pump 1: Discharge temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 636
+    register_type: read
+    name: 'Heat pump 1: Suction gas temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 637
+    register_type: read
+    name: 'Heat pump 1: High pressure'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: Bar
+    device_class: pressure
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 638
+    register_type: read
+    name: 'Heat pump 1: Low pressure'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: Bar
+    device_class: pressure
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 639
+    register_type: read
+    name: 'Heat pump 1: Calculated condensing temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 640
+    register_type: read
+    name: 'Heat pump 1: Calculated evaporating temperature'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 641
+    register_type: read
+    name: 'Heat pump 1: Superheat'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: °C
+    device_class: temperature
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 642
+    register_type: read
+    name: 'Heat pump 1: Expansion valve position'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: '%'
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 644
+    register_type: read
+    name: 'Heat pump 1: Heat quantity counter capacity'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: kW
+    device_class: energy
+    value_type: S_WORD
+  - platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 647
+    register_type: read
+    name: 'Heat pump 1: Compressor start delay timer'
+    state_class: measurement
+    accuracy_decimals: 1
+    value_type: S_WORD
+  - filters:
+      - multiply: 0.1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 648
+    register_type: read
+    name: 'Heat pump 1: Charge pump value (%)'
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: '%'
+    value_type: S_WORD
+binary_sensor:
+  - bitmask: 1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 550
+    register_type: read
+    name: Alarm active
+  - bitmask: 32
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 550
+    register_type: read
+    name: 'Heating circuit 1: Heating on'
+  - bitmask: 64
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 550
+    register_type: read
+    name: 'Heating circuit 2: Heating on'
+  - bitmask: 256
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 550
+    register_type: read
+    name: 'Info: Lower tank: Heat pump'
+  - bitmask: 512
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 550
+    register_type: read
+    name: 'Info: Upper tank: Heat pump'
+  - bitmask: 1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 620
+    register_type: read
+    name: 'HW Output: Radiator pump 1'
+  - bitmask: 2
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 620
+    register_type: read
+    name: 'HW Output: Radiator pump 2'
+  - bitmask: 4
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 620
+    register_type: read
+    name: 'HW Output: Mixing valve 1: Open'
+  - bitmask: 8
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 620
+    register_type: read
+    name: 'HW Output: Mixing valve 1: Close'
+  - bitmask: 16
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 620
+    register_type: read
+    name: 'HW Output: Mixing valve 2: Open'
+  - bitmask: 32
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 620
+    register_type: read
+    name: 'HW Output: Mixing valve 2: Close'
+  - bitmask: 16384
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 620
+    register_type: read
+    name: 'HW Output: Immersion heater: 6 kW'
+  - bitmask: 1
+    platform: modbus_controller
+    modbus_controller_id: ctc
+    address: 650
+    register_type: read
+    name: 'HW output: Compressor on/off'
