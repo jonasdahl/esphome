@@ -1,4 +1,4 @@
-Register,Byte,Bit,Selected,Description,Type,Values,Unit,Min,Max,R/W,Notes
+Register,Byte,Bit,Selected,Description,Type,Values,Unit,Min,Max,R/W,ID
 100,,,,Night reduction: Off/day by day/week program,S16,"-1=Off, 0=Day by day, 1=Week program",,-1,1,R/W,
 101,,,,Night reduction: Day 1 - Decrease 1,S16,0-24; 25=off,h,0,25,R/W,
 102,,,,Night reduction: Day 1 - Increase 1,S16,0-24; 25=off,h,0,25,R/W,
@@ -111,8 +111,8 @@ Register,Byte,Bit,Selected,Description,Type,Values,Unit,Min,Max,R/W,Notes
 209,,,,Heating circuit 1: Minimum primary flow,S16,,0.1°C,140,650,R/W,
 210,,,,Heating circuit 1: Heating off temperature,S16,,0.1°C,100,300,R/W,
 211,,,,Heating circuit 1: Heating off time,S16,,min,30,240,R/W,
-212,,,x,Heating circuit 1: Inclination,S16,,0.1°C,250,850,R/W,
-213,,,x,Heating circuit 1: Adjustment,S16,,0.1°C,-200,200,R/W,
+212,,,x,Heating circuit 1: Inclination,S16,,0.1°C,250,850,R/W,heating_circuit_1_inclination
+213,,,x,Heating circuit 1: Adjustment,S16,,0.1°C,-200,200,R/W,heating_circuit_1_adjustment
 214,,,,Heating circuit 1: Decrease Primary flow temperature,S16,,0.1°C,-400,0,R/W,
 215,,,,Heating circuit 1: Decrease Room temperatue,S16,,0.1°C,-400,0,R/W,
 216,,0,,Heating circuit 1: Room sensor: Yes/no,BOOL,"1=True, 0=False",,0,1,R/W,
@@ -199,7 +199,7 @@ Register,Byte,Bit,Selected,Description,Type,Values,Unit,Min,Max,R/W,Notes
 603,HwR,,x,Lower tank temperature,S16,,0.1°C,,,R,
 604,HwR,,,Condenser: Temperature out,S16,,0.1°C,,,R,always -999
 605,HwR,,,Condenser: Temperature in,S16,,0.1°C,,,R,
-606,HwR,,x,Outdoor temperature,S16,,0.1°C,,,R,
+606,HwR,,x,Outdoor temperature,S16,,0.1°C,,,R,outdoor_temperature
 607,HwR,,x,Heating circuit 1: Primary flow temperature,S16,,0.1°C,,,R,
 608,HwR,,x,Heating circuit 2: Primary flow temperature,S16,,0.1°C,,,R,
 609,HwR,,,Room sensor 1: Temperature,S16,,0.1°C,,,R,

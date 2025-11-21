@@ -25,6 +25,7 @@ let records = [...{
 	Unit:        null | string // "0.1Kw"
 	Min:         null | string // "-50"
 	Max:         null | string // "250"
+	ID:          null | string // "outdoor_temperature"
 	"R/W":       "R/W" | "R"
 }] & [
 	for record in list.Drop(decoded, 1) {
@@ -43,6 +44,10 @@ let converted = [
 	for record in records if record.Selected == "x" {
 		address: strconv.Atoi(record.Register)
 		register_type: {"R": "read", "R/W": "holding"}[record["R/W"]]
+
+		if record.ID != null {
+			id: record.ID
+		}
 
 		_kind: string
 		if record.Type == "S16" {

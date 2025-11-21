@@ -34,10 +34,10 @@ modbus_controller:
     setup_priority: -10
 sensor:
   - platform: template
-    name: "Heating circuit 1: Primary flow setpoint temperature (calculated)"
-    unit_of_measurement: "°C"
-    accuracy_decimals: 1
-    update_interval: 5s
+    name: 'Heating circuit 1: Primary flow setpoint temperature (calculated)'
+    unit_of_measurement: °C
+    accuracy_decimals: 0
+    update_interval: 60s
     lambda: |-
       float T_out = id(outdoor_temperature).state;
       float C     = id(heating_circuit_1_inclination).state;
@@ -45,7 +45,7 @@ sensor:
 
       float T0 = 0.65f * C + 7.5f;
 
-      if (T_ute <= 0.0f) {
+      if (T_out <= 0.0f) {
         // -15°C → 0°C
         float a = (T0 - C) / 15.0f;
         return C + (T_out + 15.0f) * a + J;
@@ -127,7 +127,8 @@ sensor:
     unit_of_measurement: °C
     device_class: temperature
     value_type: S_WORD
-  - filters:
+  - id: outdoor_temperature
+    filters:
       - multiply: 0.1
     platform: modbus_controller
     modbus_controller_id: ctc
@@ -393,7 +394,8 @@ binary_sensor:
     register_type: read
     name: 'HW output: Compressor on/off'
 number:
-  - multiply: 10.
+  - id: heating_circuit_1_inclination
+    multiply: 10.
     platform: modbus_controller
     modbus_controller_id: ctc
     address: 212
@@ -404,7 +406,8 @@ number:
     unit_of_measurement: °C
     device_class: temperature
     value_type: S_WORD
-  - multiply: 10.
+  - id: heating_circuit_1_adjustment
+    multiply: 10.
     platform: modbus_controller
     modbus_controller_id: ctc
     address: 213
@@ -467,6 +470,3 @@ number:
     register_type: holding
     entity_category: config
     name: 'Date: Year'
-
-
-
