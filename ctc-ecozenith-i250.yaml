@@ -43,18 +43,16 @@ sensor:
       float C     = id(heating_circuit_1_inclination).state;
       float J     = id(heating_circuit_1_adjustment).state;
 
-      const float T_min = 20.0;
-
-      float T0 = 0.5555054f * C + 12.193267f;
+      float T0 = 0.65f * C + 7.5f;
 
       if (T_ute <= 0.0f) {
         // -15°C → 0°C
-        float a1 = (T0 - C) / 15.0f;
-        return C + (T_outside + 15.0f) * a1 + J;
+        float a = (T0 - C) / 15.0f;
+        return C + (T_out + 15.0f) * a + J;
       } else {
         // 0°C → +20°C
-        float a2 = (T_min - T0) / 20.0f;
-        return T0 + T_outside * a2 + J;
+        float a = (20.0f - T0) / 20.0f;
+        return T0 + T_out * a + J;
       }
 
   - filters:
