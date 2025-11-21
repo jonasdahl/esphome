@@ -43,6 +43,8 @@ let converted = [
 	for record in records if record.Selected == "x" {
 		address: strconv.Atoi(record.Register)
 		register_type: {"R": "read", "R/W": "holding"}[record["R/W"]]
+
+		_kind: string
 		if record.Type == "S16" {
 			value_type: "S_WORD"
 		}
@@ -71,9 +73,23 @@ let converted = [
 		// }
 
 		if record.Type =~ "[SU]16" {
-			_kind:             "sensor"
-			state_class:       "measurement"
-			accuracy_decimals: 1
+			if register_type == "read" {
+				_kind:             "sensor"
+				state_class:       "measurement"
+				accuracy_decimals: 1
+			}
+
+			if register_type == "holding" {
+				_kind:           "number"
+				entity_category: "config"
+				if record.Unit != null {
+					if record.Unit =~ "0.." {
+						let num = strconv.ParseFloat(regexp.Find("0..", record.Unit), 64)
+						multiply: 1 / num
+						step:     num
+					}
+				}
+			}
 		}
 
 		name: record.Description
@@ -85,7 +101,7 @@ let converted = [
 		_filters: {}
 		if len(_filters) > 0 {filters: [for key, value in _filters {{(key): value}}]}
 
-		if record.Max != null && record.Min != null {
+		if record.Max != null && record.Min != null && _kind != "number" {
 			_filters: clamp: {
 				min_value:           record.Min
 				max_value:           record.Max
@@ -94,7 +110,7 @@ let converted = [
 		}
 
 		if record.Unit != null {
-			if record.Unit =~ "0.." {
+			if _kind != "number" && record.Unit =~ "0.." {
 				_filters: multiply: strconv.ParseFloat(regexp.Find("0..", record.Unit), 64)
 			}
 
@@ -196,4 +212,9 @@ let converted = [
 	// 		#modbus & register
 	// 	},
 	// ]
+	number: [
+		for register in converted if register._kind == "number" {
+			#modbus & register
+		},
+	]
 }
