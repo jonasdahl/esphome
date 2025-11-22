@@ -36,25 +36,45 @@ sensor:
   - platform: template
     name: 'Heating circuit 1: Primary flow setpoint temperature (calculated)'
     unit_of_measurement: °C
-    accuracy_decimals: 0
+    accuracy_decimals: 1
     update_interval: 60s
     lambda: |-
       float T_out = id(outdoor_temperature).state;
-      float C     = id(heating_circuit_1_inclination).state;
-      float J     = id(heating_circuit_1_adjustment).state;
+      float T_inc = id(heating_circuit_1_inclination).state;
+      float T_adj = id(heating_circuit_1_adjustment).state;
 
-      float T0 = 0.65f * C + 7.5f;
+      float k = 20.0f - T_inc;
 
-      if (T_out <= 0.0f) {
-        // -15°C → 0°C
-        float a = (T0 - C) / 15.0f;
-        return C + (T_out + 15.0f) * a + J;
+      if (T_out >= 0) {
+        k = k / 30.0f;
       } else {
-        // 0°C → +20°C
-        float a = (20.0f - T0) / 20.0f;
-        return T0 + T_out * a + J;
+        k = k / 45.0f;
       }
 
+      float m = T_inc * 2.0f / 3.0f + 20.0f / 3.0f;
+
+      return k * T_out + m + T_adj;
+  - platform: template
+    name: 'Heating circuit 2: Primary flow setpoint temperature (calculated)'
+    unit_of_measurement: °C
+    accuracy_decimals: 1
+    update_interval: 60s
+    lambda: |-
+      float T_out = id(outdoor_temperature).state;
+      float T_inc = id(heating_circuit_2_inclination).state;
+      float T_adj = id(heating_circuit_2_adjustment).state;
+
+      float k = 20.0f - T_inc;
+
+      if (T_out >= 0) {
+        k = k / 30.0f;
+      } else {
+        k = k / 45.0f;
+      }
+
+      float m = T_inc * 2.0f / 3.0f + 20.0f / 3.0f;
+
+      return k * T_out + m + T_adj;
   - filters:
       - multiply: 0.1
     platform: modbus_controller
@@ -127,9 +147,9 @@ sensor:
     unit_of_measurement: °C
     device_class: temperature
     value_type: S_WORD
-  - id: outdoor_temperature
-    filters:
+  - filters:
       - multiply: 0.1
+    id: outdoor_temperature
     platform: modbus_controller
     modbus_controller_id: ctc
     address: 606
@@ -221,7 +241,7 @@ sensor:
     name: 'Heat pump 1: High pressure'
     state_class: measurement
     accuracy_decimals: 1
-    unit_of_measurement: Bar
+    unit_of_measurement: bar
     device_class: pressure
     value_type: S_WORD
   - filters:
@@ -233,7 +253,7 @@ sensor:
     name: 'Heat pump 1: Low pressure'
     state_class: measurement
     accuracy_decimals: 1
-    unit_of_measurement: Bar
+    unit_of_measurement: bar
     device_class: pressure
     value_type: S_WORD
   - filters:
@@ -293,7 +313,7 @@ sensor:
     state_class: measurement
     accuracy_decimals: 1
     unit_of_measurement: kW
-    device_class: energy
+    device_class: power
     value_type: S_WORD
   - platform: modbus_controller
     modbus_controller_id: ctc
@@ -418,7 +438,8 @@ number:
     unit_of_measurement: °C
     device_class: temperature
     value_type: S_WORD
-  - multiply: 10.
+  - id: heating_circuit_2_inclination
+    multiply: 10.
     platform: modbus_controller
     modbus_controller_id: ctc
     address: 224
@@ -429,7 +450,8 @@ number:
     unit_of_measurement: °C
     device_class: temperature
     value_type: S_WORD
-  - multiply: 10.
+  - id: heating_circuit_2_adjustment
+    multiply: 10.
     platform: modbus_controller
     modbus_controller_id: ctc
     address: 225

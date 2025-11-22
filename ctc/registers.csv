@@ -120,8 +120,8 @@ Register,Byte,Bit,Selected,Description,Type,Values,Unit,Min,Max,R/W,ID
 221,,,,Heating circuit 2: Minimum primary flow,S16,,0.1°C,140,650,R/W,
 222,,,,Heating circuit 2: Heating off temperature,S16,,0.1°C,100,300,R/W,
 223,,,,Heating circuit 2: Heating off time,S16,,min,30,240,R/W,
-224,,,x,Heating circuit 2: Inclination,S16,,0.1°C,250,850,R/W,
-225,,,x,Heating circuit 2: Adjustment,S16,,0.1°C,-200,200,R/W,
+224,,,x,Heating circuit 2: Inclination,S16,,0.1°C,250,850,R/W,heating_circuit_2_inclination
+225,,,x,Heating circuit 2: Adjustment,S16,,0.1°C,-200,200,R/W,heating_circuit_2_adjustment
 226,,,,Heating circuit 2: Decrease Primary flow temperature,S16,,0.1°C,-400,0,R/W,
 227,,,,Heating circuit 2: Decrease Room temperatue,S16,,0.1°C,-400,0,R/W,
 228,,0,,Heating circuit 2: Room sensor: Yes/no,BOOL,"1=True, 0=False",,0,1,R/W,
