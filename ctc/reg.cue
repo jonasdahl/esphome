@@ -202,6 +202,30 @@ let converted = [
 		...
 	}
 
+	#setpoint: {
+		T_out: string
+		T_inc: string
+		T_adj: string
+
+		lambda: """
+			float T_out = id(\(T_out)).state;
+			float T_inc = id(\(T_inc)).state;
+			float T_adj = id(\(T_adj)).state;
+
+			float k = 20.0f - T_inc;
+
+			if (T_out >= 0) {
+			  k = k / 30.0f;
+			} else {
+			  k = k / 45.0f;
+			}
+
+			float m = T_inc * 2.0f / 3.0f + 20.0f / 3.0f;
+
+			return k * T_out + m + T_adj;
+			"""
+	}
+
 	sensor: [
 		{
 			platform:            "template"
@@ -209,46 +233,24 @@ let converted = [
 			unit_of_measurement: "°C"
 			accuracy_decimals:   1
 			update_interval:     "60s"
-			lambda: """
-				float T_out = id(outdoor_temperature).state;
-				float T_inc = id(heating_circuit_1_inclination).state;
-				float T_adj = id(heating_circuit_1_adjustment).state;
+			lambda: (#setpoint & {
+				T_out: "outdoor_temperature"
+				T_inc: "heating_circuit_1_inclination"
+				T_adj: "heating_circuit_1_adjustment"
+			}).lambda
+		},
 
-				float k = 20.0f - T_inc;
-
-				if (T_out >= 0) {
-				  k = k / 30.0f;
-				} else {
-				  k = k / 45.0f;
-				}
-
-				float m = T_inc * 2.0f / 3.0f + 20.0f / 3.0f;
-
-				return k * T_out + m + T_adj;
-				"""
-		}, {
+		{
 			platform:            "template"
 			name:                "Heating circuit 2: Primary flow setpoint temperature (calculated)"
 			unit_of_measurement: "°C"
 			accuracy_decimals:   1
 			update_interval:     "60s"
-			lambda: """
-				float T_out = id(outdoor_temperature).state;
-				float T_inc = id(heating_circuit_2_inclination).state;
-				float T_adj = id(heating_circuit_2_adjustment).state;
-
-				float k = 20.0f - T_inc;
-
-				if (T_out >= 0) {
-				  k = k / 30.0f;
-				} else {
-				  k = k / 45.0f;
-				}
-
-				float m = T_inc * 2.0f / 3.0f + 20.0f / 3.0f;
-
-				return k * T_out + m + T_adj;
-				"""
+			lambda: (#setpoint & {
+				T_out: "outdoor_temperature"
+				T_inc: "heating_circuit_2_inclination"
+				T_adj: "heating_circuit_2_adjustment"
+			}).lambda
 		},
 		for register in converted if register._kind == "sensor" {
 			#modbus & register
